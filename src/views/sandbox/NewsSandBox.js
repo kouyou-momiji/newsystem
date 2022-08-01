@@ -1,7 +1,7 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-06-29 22:14:55
- * @LastEditTime: 2022-07-18 23:18:20
+ * @LastEditTime: 2022-07-31 11:28:06
  * @Description: 
  */
 import React from 'react'
@@ -15,7 +15,7 @@ import RightList from './right-manage/RightList'
 import Nopermission from './nopermission/Nopermission'
 import './NewsSandBox.css'
 
-import { Layout, Menu } from 'antd';
+import { AutoComplete, Layout, Menu } from 'antd';
 const { Content } = Layout;
 
 export default function NewsSandBox() {
@@ -30,6 +30,7 @@ export default function NewsSandBox() {
             margin: '24px 16px',
             padding: 24,
             minHeight: 280,
+            overflow: 'auto',
           }}
         >
           <Switch>
