@@ -1,13 +1,14 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-07-18 07:28:17
- * @LastEditTime: 2022-08-01 21:19:51
+ * @LastEditTime: 2022-08-01 22:17:13
  * @Description: 
  */
 import React, { useState,useEffect } from 'react'
-import { Table, Tag, Button } from 'antd';
+import { Table, Tag, Button, Modal, Popover, Switch } from 'antd';
 import axios from 'axios';
-import {DeleteOutlined, EditOutlined} from '@ant-design/icons';
+import {DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+const { confirm } = Modal;
 
 export default function RightList() {
 
@@ -17,7 +18,10 @@ export default function RightList() {
   useEffect(() => {
     axios.get("http://localhost:5000/rights?_embed=children").then(res => {
         const list = res.data
-        list[0].children = ''
+        list.forEach(item => {
+            if(item.children.length === 0)
+            item.children = ""
+        })
         setDataSource(list) 
     })
   },[])
@@ -46,14 +50,58 @@ export default function RightList() {
     },
     {
       title: '操作',
-      render: () => {
+      render: (item) => {
         return <div>
-          <Button danger type="primary" shape="circle" icon={<DeleteOutlined />} />
-          <Button type="primary" shape="circle" icon={<EditOutlined />} />
+          <Button danger type="primary" shape="circle" onClick={() => confirmMethon(item)} icon={<DeleteOutlined />} />
+          <Popover content={<div style={{textAlign: 'center'}}>
+            <Switch checked={item.pagepermisson} onChange={() => {switchMethod(item)}}></Switch>
+          </div>} title="页面配置项" trigger={item.pagepermisson===undefined ? "" : "click"}>
+            <Button type="primary" shape="circle" icon={<EditOutlined />} disabled={item.pagepermisson===undefined}/></Popover>
         </div>
       }
     },
   ];
+
+  const switchMethod = (item) => {
+    item.pagepermisson = item.pagepermisson===1?0:1
+    setDataSource([...dataSource])
+    if(item.grade===1){
+        axios.patch(`http://localhost:5000/rights/${item.id}`, {
+            pagepermisson: item.pagepermisson
+        })
+    }else{
+        axios.patch(`http://localhost:5000/children/${item.id}`,{
+            pagepermisson: item.pagepermisson
+        })
+    }
+  }
+
+  const confirmMethon = (item) => {
+    confirm({
+        title: '你确定要删除吗?',
+        icon: <ExclamationCircleOutlined />,
+        content: 'Some descriptions',
+        onOk() {
+            deleteMethod(item);
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
+      });
+  }
+
+  const deleteMethod = (item) => {
+    console.log(item)
+    if(item.grade === 1){
+        setDataSource(dataSource.filter(data => data.id !== item.id))
+        axios.delete(`http://localhost:5000/rights/${item.id}`)
+    }else{
+         let list = dataSource.filter(data => data.id===item.rightId)
+         list[0].children = list[0].children.filter(data => data.id!==item.id)
+         setDataSource([...dataSource])
+         axios.delete(`http://localhost:5000/children/${item.id}`)
+    }
+  }
 
   return (
     <div>
