@@ -1,16 +1,19 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-08-04 23:29:56
- * @LastEditTime: 2022-08-04 23:56:41
+ * @LastEditTime: 2022-08-08 20:47:59
  * @Description: 
  */
-import React, { forwardRef, useState } from 'react'
+import React, { forwardRef, useEffect, useState } from 'react'
 import { Select, Form, Input } from 'antd';
 const { Option } = Select;
 
 const UserForm = forwardRef((props, ref) => {
   const { regionList, roleList } = props
   const [isDisable, setIsDisable] = useState(false)
+  useEffect(() => {
+    setIsDisable(props.isUpdateDisabled)
+  },[props.isUpdateDisabled])
   return (
     <Form
           ref={ref}

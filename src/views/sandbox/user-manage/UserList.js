@@ -1,7 +1,7 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-07-18 07:28:17
- * @LastEditTime: 2022-08-08 20:22:43
+ * @LastEditTime: 2022-08-08 21:44:17
  * @Description: 
  */
 import React, { useState,useEffect, useRef } from 'react'
@@ -17,9 +17,13 @@ export default function UserList() {
 
   const [dataSource, setDataSource] = useState([])
   const [isAddvisible, setIsAddvisible] = useState(false)
+  const [isUpdateVisible, setIsUpdateVisible] = useState(false)
   const [roleList, setRoleList] = useState([])
   const [regionList, setRegionList] = useState([])
+  const [isUpdateDisabled, setIsUpdateDisabled] = useState()
+  const [currentData, setCurrentData] = useState(null);
   const addForm = useRef(null)
+  const updateForm = useRef(null)
 
   useEffect(() => {
     axios.get("http://localhost:5000/users?_expand=role").then(res => {
@@ -45,6 +49,22 @@ export default function UserList() {
       title: '区域',
       dataIndex: 'region',
       // key: 'id',
+      filters: [
+        ...regionList.map(item => ({
+          text: item.title,
+          value: item.value,
+        })),
+        {
+          text:"全球",
+          value: "全球",
+        }
+      ],
+      onFilter:(value, item) =>{
+        if(value==="全球"){
+          return item.region===""
+        }
+        return item.region===value
+      },
       render: (region) => {
         return <b>{region==='' ? '全球' : region}</b>
       }
@@ -64,7 +84,7 @@ export default function UserList() {
       title: '用户状态',
       dataIndex: 'roleState',
       render: (roleState,item) => {
-        return <Switch checked={roleState} disabled={item.default}></Switch>
+        return <Switch onChange={() => handleChange(item)} checked={roleState} disabled={item.default}></Switch>
       }
     },
     {
@@ -72,11 +92,43 @@ export default function UserList() {
       render: (item) => {
         return <div>
           <Button danger type="primary" shape="circle" onClick={() => confirmMethon(item)} icon={<DeleteOutlined />} />
-          <Button type="primary" shape="circle" icon={<EditOutlined />} />
+          <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={() => handleUpdate(item)} />
         </div>
       }
     },
   ];
+
+  const handleUpdate = (item) => {
+    // setTimeout(() => {
+      // if(item.roleId===1){
+      //   setIsUpdateDisabled(true)
+      // }else{
+      //   setIsUpdateDisabled(false)
+      // }
+    //   setIsUpdateVisible(true)
+    //   updateForm.current.setFieldsValue(item)
+    // },0)
+    setIsUpdateVisible(true)
+    setTimeout(() => {
+      if(item.roleId===1){
+        setIsUpdateDisabled(true)
+      }else{
+        setIsUpdateDisabled(false)
+      }
+      setCurrentData(item)
+      item.roleId = item.roleId+""
+      updateForm.current.setFieldsValue(item)
+    }, 0);
+    
+  }
+
+  const handleChange = (item) => {
+    item.roleState = !item.roleState
+    setDataSource([...dataSource])
+    axios.patch(`http://localhost:5000/users/${item.id}`,{
+      roleState: item.roleState
+    })
+  }
 
   const confirmMethon = (item) => {
     confirm({
@@ -97,7 +149,7 @@ export default function UserList() {
     axios.delete(`http://localhost:5000/users/${item.id}`)
   }
 
-  const addFormOk = async() => {
+  const addFormOk = () => {
     addForm.current.validateFields().then(value => {
       setIsAddvisible(false)
       addForm.current.resetFields()
@@ -116,6 +168,22 @@ export default function UserList() {
       console.log('error=',err)
     })
     
+  }
+
+  const updateFormOk = () => {
+    updateForm.current.validateFields().then(value => {
+      setIsUpdateVisible(false)
+      axios.patch(`http://localhost:5000/users/${currentData.id}`, {
+        ...value,
+      }).then(res => {
+        axios.get("http://localhost:5000/users?_expand=role").then(res => {
+            const list = res.data
+            setDataSource(list) 
+        })  
+      })
+    }).catch(err => {
+      console.log('error=',err)
+    })
   }
 
   return (
@@ -138,6 +206,18 @@ export default function UserList() {
       >
         <UserForm regionList={regionList} roleList={roleList} ref={addForm}></UserForm>
       </Modal>
+
+      <Modal
+        visible={isUpdateVisible}
+        title="更新用户"
+        okText="更新"
+        cancelText="取消"
+        onCancel={()  => {setIsUpdateVisible(false);setIsUpdateDisabled(!isUpdateDisabled)}}
+        onOk={updateFormOk}
+      >
+        <UserForm regionList={regionList} roleList={roleList} ref={updateForm} isUpdateDisabled={isUpdateDisabled}></UserForm>
+      </Modal>
+
     </div>
   )
 }
