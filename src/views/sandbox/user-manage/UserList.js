@@ -1,7 +1,7 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-07-18 07:28:17
- * @LastEditTime: 2022-08-08 21:44:17
+ * @LastEditTime: 2022-08-09 23:28:25
  * @Description: 
  */
 import React, { useState,useEffect, useRef } from 'react'
@@ -24,11 +24,19 @@ export default function UserList() {
   const [currentData, setCurrentData] = useState(null);
   const addForm = useRef(null)
   const updateForm = useRef(null)
-
+  const { roleId, region, username } = JSON.parse(localStorage.getItem("token"))
+  const roleObj = {
+    "1":"superadmin",
+    "2":"admin",
+    "3":"editor",
+  }
   useEffect(() => {
     axios.get("http://localhost:5000/users?_expand=role").then(res => {
         const list = res.data
-        setDataSource(list) 
+        setDataSource(roleObj[roleId]==="superadmin" ? list : [
+          ...list.filter(item=>item.username===username),
+          ...list.filter(item=>item.region===region&&roleObj[item.roleId]==="editor"),
+        ]) 
     })
   },[])
   useEffect(() => {
@@ -215,7 +223,7 @@ export default function UserList() {
         onCancel={()  => {setIsUpdateVisible(false);setIsUpdateDisabled(!isUpdateDisabled)}}
         onOk={updateFormOk}
       >
-        <UserForm regionList={regionList} roleList={roleList} ref={updateForm} isUpdateDisabled={isUpdateDisabled}></UserForm>
+        <UserForm regionList={regionList} roleList={roleList} isUpdate={true} ref={updateForm} isUpdateDisabled={isUpdateDisabled}></UserForm>
       </Modal>
 
     </div>

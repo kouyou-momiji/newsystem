@@ -1,7 +1,7 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-07-18 07:11:38
- * @LastEditTime: 2022-07-23 10:14:51
+ * @LastEditTime: 2022-08-09 22:59:34
  * @Description: 
  */
 import React, { useState, useEffect } from 'react';
@@ -49,8 +49,10 @@ function SideMenu(props) {
     };
   }
 
+  const { role:{rights} } = JSON.parse(localStorage.getItem("token"))
+
   const checkPagePermission = (item) => {
-    return item.pagepermisson===1
+    return item.pagepermisson===1 && rights.includes(item.key)
   }
   
   const getItems = (myList) => {

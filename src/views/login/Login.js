@@ -1,20 +1,30 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-06-29 22:14:19
- * @LastEditTime: 2022-08-09 22:34:59
+ * @LastEditTime: 2022-08-09 22:49:37
  * @Description: 
  */
 import React from 'react'
-import { Form, Button, Input } from 'antd'
+import { Form, Button, Input, message } from 'antd'
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
+import axios from 'axios';
 import './Login.css'
 
-export default function Login() {
+export default function Login(props) {
 
   const onFinish = (values) => {
     console.log(values)
+    axios.get(`http://localhost:5000/users?username=${values.username}&password=${values.password}&roleState=true&_expand=role`).then(res => {
+      console.log(res.data)
+      if(res.data.length===0){
+        message.error("用户名密码不匹配!")
+      }else{
+        localStorage.setItem("token", JSON.stringify(res.data[0]))
+        props.history.push("/")
+      }
+    })
   }
 
   const particlesInit = async (main) => {
