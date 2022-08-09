@@ -1,7 +1,7 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-07-18 07:11:44
- * @LastEditTime: 2022-07-19 07:05:50
+ * @LastEditTime: 2022-08-09 21:40:30
  * @Description: 
  */
 import React, { useState } from 'react'
@@ -13,9 +13,10 @@ import {
   VideoCameraOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Dropdown, Avatar } from 'antd';
+import { withRouter } from 'react-router-dom';
 const { Header } = Layout;
 
-export default function TopHeader() {
+function TopHeader(props) {
   const [collapsed, setCollapsed] = useState(false);
 
   const changeCollapsed = () => {
@@ -32,7 +33,12 @@ export default function TopHeader() {
         {
           key: '2',
           danger: true,
-          label: '退出',
+          label: (
+            <div onClick={() => {
+              localStorage.removeItem("token")
+              props.history.replace("/login")
+            }}>退出</div>
+          ),
         },
       ]}
     />
@@ -58,3 +64,5 @@ export default function TopHeader() {
     </Header>
   )
 }
+
+export default withRouter(TopHeader)
