@@ -1,7 +1,7 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-08-10 21:28:54
- * @LastEditTime: 2022-08-10 22:17:40
+ * @LastEditTime: 2022-08-10 22:34:26
  * @Description: 
  */
 import React, { useEffect, useState } from 'react'
@@ -40,8 +40,8 @@ export default function NewsRouter() {
   const [BackRouteList, setBackRouteList] = useState([])
   useEffect(() => {
     Promise.all([
-      axios.get("http://localhost:5000/rights"),
-      axios.get("http://localhost:5000/children"),
+      axios.get("/rights"),
+      axios.get("/children"),
     ]).then(res => {
       setBackRouteList([...res[0].data,...res[1].data])
     })
@@ -59,7 +59,6 @@ export default function NewsRouter() {
       {
         BackRouteList.map(item=>{
           if(checkRoute(item) && checkUserPermission(item)){
-            console.log("进来了")
             return <Route path={item.key} key={item.key} component={LocalRouterMap[item.key]} exact/>
           }
           return null

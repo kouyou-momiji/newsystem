@@ -1,7 +1,7 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-07-18 07:28:17
- * @LastEditTime: 2022-08-10 21:49:07
+ * @LastEditTime: 2022-08-10 22:41:40
  * @Description: 
  */
 import React, { useState,useEffect, useRef } from 'react'
@@ -31,7 +31,7 @@ export default function UserList() {
     "3":"editor",
   }
   useEffect(() => {
-    axios.get("http://localhost:5000/users?_expand=role").then(res => {
+    axios.get("/users?_expand=role").then(res => {
         const list = res.data
         setDataSource(roleObj[roleId]==="superadmin" ? list : [
           ...list.filter(item=>item.username===username),
@@ -40,13 +40,13 @@ export default function UserList() {
     })
   },[])
   useEffect(() => {
-    axios.get("http://localhost:5000/regions").then(res => {
+    axios.get("/regions").then(res => {
         const list = res.data
         setRegionList(list) 
     })
   },[])
   useEffect(() => {
-    axios.get("http://localhost:5000/roles").then(res => {
+    axios.get("/roles").then(res => {
         const list = res.data
         setRoleList(list) 
     })
@@ -133,7 +133,7 @@ export default function UserList() {
   const handleChange = (item) => {
     item.roleState = !item.roleState
     setDataSource([...dataSource])
-    axios.patch(`http://localhost:5000/users/${item.id}`,{
+    axios.patch(`/users/${item.id}`,{
       roleState: item.roleState
     })
   }
@@ -154,19 +154,19 @@ export default function UserList() {
 
   const deleteMethod = (item) => {
     setDataSource(dataSource.filter(data => data.id !== item.id))
-    axios.delete(`http://localhost:5000/users/${item.id}`)
+    axios.delete(`/users/${item.id}`)
   }
 
   const addFormOk = () => {
     addForm.current.validateFields().then(value => {
       setIsAddvisible(false)
       addForm.current.resetFields()
-      axios.post(`http://localhost:5000/users`, {
+      axios.post(`/users`, {
         ...value,
         "roleState": true,
         "default": false,
       }).then(res => {
-        axios.get("http://localhost:5000/users?_expand=role").then(res => {
+        axios.get("/users?_expand=role").then(res => {
             const list = res.data
             setDataSource(list) 
         })
@@ -181,10 +181,10 @@ export default function UserList() {
   const updateFormOk = () => {
     updateForm.current.validateFields().then(value => {
       setIsUpdateVisible(false)
-      axios.patch(`http://localhost:5000/users/${currentData.id}`, {
+      axios.patch(`/users/${currentData.id}`, {
         ...value,
       }).then(res => {
-        axios.get("http://localhost:5000/users?_expand=role").then(res => {
+        axios.get("/users?_expand=role").then(res => {
             const list = res.data
             setDataSource(list) 
         })  
