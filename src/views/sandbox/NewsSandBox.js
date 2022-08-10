@@ -1,18 +1,13 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-06-29 22:14:55
- * @LastEditTime: 2022-07-31 11:28:06
+ * @LastEditTime: 2022-08-10 21:30:54
  * @Description: 
  */
 import React from 'react'
 import SideMenu from '../../components/sandbox/SideMenu'
 import TopHeader from '../../components/sandbox/TopHeader'
-import { Switch,Route,Redirect } from 'react-router-dom'
-import Home from './home/Home'
-import UserList from './user-manage/UserList'
-import RoleList from './right-manage/RoleList'
-import RightList from './right-manage/RightList'
-import Nopermission from './nopermission/Nopermission'
+import NewsRouter from '../../components/sandbox/NewsRouter'
 import './NewsSandBox.css'
 
 import { AutoComplete, Layout, Menu } from 'antd';
@@ -33,14 +28,7 @@ export default function NewsSandBox() {
             overflow: 'auto',
           }}
         >
-          <Switch>
-            <Route path='/home' component={Home}/>
-            <Route path='/user-manage/list' component={UserList}/>
-            <Route path='/right-manage/role/list' component={RoleList}/>
-            <Route path='/right-manage/right/list' component={RightList}/>
-            <Redirect from="/" to="/home" exact/>
-            <Route path="*" component={Nopermission}></Route>
-          </Switch>
+          <NewsRouter />
         </Content>
         
       </Layout>
