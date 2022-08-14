@@ -1,13 +1,99 @@
 /*
  * @Author: yanzhourong
- * @Date: 2022-08-10 21:42:58
- * @LastEditTime: 2022-08-10 21:43:16
+ * @Date: 2022-07-18 07:28:17
+ * @LastEditTime: 2022-08-14 11:04:15
  * @Description: 
  */
-import React from 'react'
+import React, { useState,useEffect } from 'react'
+import { Table, Tag, Button, Modal, Popover, Switch } from 'antd';
+import axios from 'axios';
+import {DeleteOutlined, EditOutlined, ExclamationCircleOutlined, UploadOutlined } from '@ant-design/icons';
+const { confirm } = Modal;
 
 export default function NewsDraft() {
+
+
+  const [dataSource, setDataSource] = useState([])
+
+  const {username} = JSON.parse(localStorage.getItem("token"))
+  useEffect(() => {
+    axios.get(`/news?author=${username}&auditState=0&_expand=category`).then(res => {
+      const list = res.data
+      setDataSource(list) 
+    })
+  },[username])
+
+  const columns = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      // key: 'id',
+      render: (id) => {
+        return <b>{id}</b>
+      }
+    },
+    {
+      title: '新闻标题',
+      dataIndex: 'title',
+      render: (title,item) => {
+        return <a href={`#/news-manage/preview/${item.id}`}>{title}</a>
+      }
+    },
+    {
+      title: '作者',
+      dataIndex: 'author',
+      // key: 'title',
+    },
+    {
+      title: '分类',
+      dataIndex: 'category',
+      // key: 'key',
+      render: (category) => {
+        return category?.title
+      }
+    },
+    {
+      title: '操作',
+      render: (item) => {
+        return <div>
+          <Button danger type="primary" shape="circle" onClick={() => confirmMethon(item)} icon={<DeleteOutlined />} />
+          
+            <Button type="primary" shape="circle" icon={<EditOutlined />} />
+
+            <Button type="primary" shape="circle" icon={<UploadOutlined />} />
+        </div>
+      }
+    },
+  ];
+
+  const confirmMethon = (item) => {
+    confirm({
+        title: '你确定要删除吗?',
+        icon: <ExclamationCircleOutlined />,
+        content: 'Some descriptions',
+        onOk() {
+            deleteMethod(item);
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
+      });
+  }
+
+  const deleteMethod = (item) => {
+    console.log(item)
+    setDataSource(dataSource.filter(data => data.id !== item.id))
+    axios.delete(`/news/${item.id}`)
+  }
+
   return (
-    <div>NewsDraft</div>
+    <div>
+      <Table dataSource={dataSource} columns={columns} 
+      pagination={{
+        pageSize: 5,
+      }}
+      rowKey={'id'}
+      />
+    </div>
   )
 }
