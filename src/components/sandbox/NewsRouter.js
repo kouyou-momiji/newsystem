@@ -1,7 +1,7 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-08-10 21:28:54
- * @LastEditTime: 2022-08-14 11:00:33
+ * @LastEditTime: 2022-08-14 11:49:28
  * @Description: 
  */
 import React, { useEffect, useState } from 'react'
@@ -21,6 +21,7 @@ import Published from '../../views/sandbox/publish-manage/Published'
 import Sunset from '../../views/sandbox/publish-manage/Sunset'
 import axios from 'axios'
 import NewsPreview from '../../views/sandbox/news-manage/NewsPreview'
+import NewsUpdate from '../../views/sandbox/news-manage/NewsUpdate'
 
 const LocalRouterMap = {
   "/home":Home,
@@ -31,6 +32,7 @@ const LocalRouterMap = {
   "/news-manage/draft": NewsDraft,
   "/news-manage/category": NewsCategory,
   "/news-manage/preview/:id": NewsPreview,
+  "/news-manage/update/:id": NewsUpdate,
   "/audit-manage/audit": Audit,
   "/audit-manage/list": AuditList,
   "/publish-manage/unpublished": Unpublished,

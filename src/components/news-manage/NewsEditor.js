@@ -1,18 +1,28 @@
 /*
  * @Author: yanzhourong
  * @Date: 2022-08-13 10:13:39
- * @LastEditTime: 2022-08-13 10:45:35
+ * @LastEditTime: 2022-08-14 15:16:35
  * @Description: 
  */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { EditorState, convertToRaw } from 'draft-js';
+import { EditorState, convertToRaw, ContentState } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import htmlToDraft from 'html-to-draftjs';
 
 export default function NewsEditor(props) {
   const [editorState, setEditorState] = useState("")
+  useEffect(()=>{
+    const html = props.content
+    if(html===undefined){return}
+    const contentBlock = htmlToDraft(html);
+    if (contentBlock) {
+      const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+      const editorState = EditorState.createWithContent(contentState);
+      setEditorState(editorState)
+    }
+  }, [props.content])
   return (
     <div>
       <Editor
